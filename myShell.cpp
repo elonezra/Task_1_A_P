@@ -13,7 +13,8 @@ int main() {
 char command[1024];
 char *token;
 char *outfile;
-int i, fd, amper, redirect, retid, status;
+char *buff;
+int i, fd, amper, redirect, redirect_append, retid, status;
 char *argv[10];
 
 while (1)
@@ -32,7 +33,14 @@ while (1)
         i++;
     }
     argv[i] = NULL;
-
+    int j = 0;
+    while(i >j)
+    {
+        printf("%d) %s\n",j, argv[j]);
+        j++;
+    }
+    cerr << strcmp(argv[i - 2], ">") << "\n";
+    cerr << strcmp(argv[i - 2], ">>") << "\n";
     /* Is command empty */
     if (argv[0] == NULL)
         continue;
@@ -53,6 +61,15 @@ while (1)
     else 
         redirect = 0; 
 
+    if (argv[i - 2] != NULL && ! strcmp(argv[i - 2], ">>")) {//cant cmpr null
+        //printf("found >>\n");
+        redirect_append = 1;
+        argv[i - 2] = NULL;
+        outfile = argv[i - 1];
+        }
+    else 
+        redirect_append = 0; 
+
     /* for commands not part of the shell command language */ 
 
     if (fork() == 0) { 
@@ -61,13 +78,26 @@ while (1)
             fd = creat(outfile, 0660); 
             close (STDOUT_FILENO); 
             dup(fd);
+            close(fd); 
+        }
+        else if(1)
+        {
+                        fd = creat(outfile, 0660); 
+
             close(STDERR_FILENO);
             dup(fd);
+        }
+        else if (redirect_append)
+        {
+            fd = creat(outfile, O_WRONLY | O_APPEND); 
+            close (STDOUT_FILENO); 
+            read(STDOUT_FILENO, buff, 100);
+            write(fd, buff, strlen(buff));
             close(fd); 
-            /* stdout is now redirected */
-        } 
+        }
+         
         
-            execvp(argv[0], argv);
+        execvp(argv[0], argv);
  
         
         
