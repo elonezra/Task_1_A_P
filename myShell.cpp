@@ -9,14 +9,40 @@
 #include <iostream>
 using namespace std;
 
-int main() {
-char command[1024];
-char *token;
-char *outfile;
-char *buff;
-int i, fd, amper, redirect, redirect_append, retid, status;
-char *argv[10];
+    char command[1024];
+    char *token;
+    char *outfile;
+    char *buff;
+    int i, fd, amper, redirect, redirect_err, redirect_append, retid, status;
+    char *argv[10];
 
+
+void redirection_check()
+{
+    printf("redirect: %d  redirect_err: %d   redirect_append: %d\n", redirect, redirect_err, redirect_append);
+    std::cout.flush();// flush the buffer so my prints wont get in the files
+    if (redirect) {
+            fd = creat(outfile, 0660); 
+            close (STDOUT_FILENO); 
+            dup(fd);
+            close(fd); 
+        }
+        else if(redirect_err)
+        {
+            fd = creat(outfile, 0660); 
+            close(STDERR_FILENO);
+            dup(fd);
+            close(fd);
+        }
+        else if (redirect_append)
+        {
+            // close (STDOUT_FILENO); 
+            // std::ofstream fout(outfile, std::ofstream::out | std::ofstream::app);
+            // close(fd); 
+        }
+}
+
+int main() {
 while (1)
 {
     printf("hello: ");
@@ -39,8 +65,6 @@ while (1)
         printf("%d) %s\n",j, argv[j]);
         j++;
     }
-    cerr << strcmp(argv[i - 2], ">") << "\n";
-    cerr << strcmp(argv[i - 2], ">>") << "\n";
     /* Is command empty */
     if (argv[0] == NULL)
         continue;
@@ -51,16 +75,23 @@ while (1)
         argv[i - 1] = NULL;
     }
     else 
-        amper = 0; 
+        amper = 0;
 
-    if (! strcmp(argv[i - 2], ">")) {
-        redirect = 1;
+    if (! strcmp(argv[i - 2], "2>")) {
+        redirect_err = 1;
         argv[i - 2] = NULL;
         outfile = argv[i - 1];
         }
-    else 
-        redirect = 0; 
-
+    else {
+        redirect_err = 0; 
+        if (! strcmp(argv[i - 2], ">")) {
+            redirect = 1;
+            argv[i - 2] = NULL;
+            outfile = argv[i - 1];
+            }
+        else 
+            redirect = 0; 
+    }
     if (argv[i - 2] != NULL && ! strcmp(argv[i - 2], ">>")) {//cant cmpr null
         //printf("found >>\n");
         redirect_append = 1;
@@ -74,33 +105,9 @@ while (1)
 
     if (fork() == 0) { 
         /* redirection of IO ? */
-        if (redirect) {
-            fd = creat(outfile, 0660); 
-            close (STDOUT_FILENO); 
-            dup(fd);
-            close(fd); 
-        }
-        else if(1)
-        {
-                        fd = creat(outfile, 0660); 
-
-            close(STDERR_FILENO);
-            dup(fd);
-        }
-        else if (redirect_append)
-        {
-            fd = creat(outfile, O_WRONLY | O_APPEND); 
-            close (STDOUT_FILENO); 
-            read(STDOUT_FILENO, buff, 100);
-            write(fd, buff, strlen(buff));
-            close(fd); 
-        }
-         
-        
-        execvp(argv[0], argv);
+        redirection_check();
  
-        
-        
+        execvp(argv[0], argv); 
     }
     /* parent continues here */
     if (amper == 0)
