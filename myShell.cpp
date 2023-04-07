@@ -16,8 +16,12 @@ using namespace std;
     char *buff;
     int i, fd, amper, redirect, redirect_err, redirect_append, retid, status;
     char *argv[10];
+    string prompt = "E_Shell";
 
-
+/*
+* this function handel all redirecting. 
+* it's include >, >>, 2>
+*/
 void redirection_check()
 {
     printf("redirect: %d  redirect_err: %d   redirect_append: %d\n", redirect, redirect_err, redirect_append);
@@ -42,11 +46,11 @@ void redirection_check()
             close(fd); 
         }
 }
-
-int main() {
-while (1)
+/**
+ * parse the cmd parts into argv array
+*/
+void cmd_parser()
 {
-    printf("hello: ");
     fgets(command, 1024, stdin);
     command[strlen(command) - 1] = '\0';
 
@@ -60,12 +64,24 @@ while (1)
         i++;
     }
     argv[i] = NULL;
+}
+
+int main() {
+while (1)
+{
+    cerr<< prompt<< ": ";
+
+    cmd_parser();
+    
+    /// for debug perpuse
     int j = 0;
     while(i > j)
     {
         printf("%d) %s\n",j, argv[j]);
         j++;
     }
+    ////////////////
+
 
     /* Is command empty */
     if (argv[0] == NULL)
@@ -101,6 +117,11 @@ while (1)
         }
     else 
         redirect_append = 0; 
+    if (!strcmp(argv[i - 2], "=") && !strcmp(argv[0], "prompt"))
+    {
+        prompt = argv[i - 1];
+    }
+
 
     /* for commands not part of the shell command language */ 
 
