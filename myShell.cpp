@@ -8,6 +8,7 @@
 #include <string.h>
 #include <iostream>
 #include <fstream>
+#define MAX_COMMANDS 20
 using namespace std;
 
     char command[1024];
@@ -17,7 +18,8 @@ using namespace std;
     int i, fd, amper, redirect, redirect_err, redirect_append, retid, status;
     char *argv[10];
     char prompt[10] = "E_Shell2";
-
+    char commands[MAX_COMMANDS][1024];
+    int commands_index = 0;
 
 void redirection_check()
 {
@@ -44,14 +46,14 @@ void redirection_check()
         }
 }
 
-void cmd_parser()
+void cmd_parser(char *cmd)
 {
-    fgets(command, 1024, stdin);
-    command[strlen(command) - 1] = '\0';
 
+    strcpy(commands[commands_index % MAX_COMMANDS], cmd);
+    commands_index++;
     /* parse command line */
     i = 0;
-    token = strtok (command," ");
+    token = strtok (cmd," ");
     while (token != NULL)
     {
         argv[i] = token;
@@ -65,8 +67,25 @@ int main() {
 while (1)
 {
     printf("%s: ", prompt);
-    cmd_parser();
+    fgets(command, 1024, stdin);
+    command[strlen(command) - 1] = '\0';
     
+
+    if (!strcmp(command, "!!"))
+        {
+            if (commands_index == 0)
+            {
+                printf("No previous command.\n");
+                continue;
+            }
+            else
+            {
+                /* Get last command and execute it */
+                strcpy(command, commands[(commands_index - 1) % MAX_COMMANDS]);
+                printf("Executing: %s\n", command);
+            }
+        }
+        cmd_parser(command);
     // int j = 0;
     // while(i > j)
     // {
@@ -77,19 +96,17 @@ while (1)
     /* Is command empty */
     if (argv[0] == NULL)
         continue;
+
+
     if ( argv[0]=="echo" )
     {
         for (int t = 1; argv[t] != NULL; t++)
         {
             printf("%s",argv[t]);
         }
-        
     }
-    
-
     if (argv[i-2] != NULL && !strcmp(argv[i - 2], "=") && !strcmp(argv[0], "prompt"))
     {
-        // prompt = argv[i - 1];
         strncpy(prompt, argv[i - 1], sizeof(prompt));
     }
 
