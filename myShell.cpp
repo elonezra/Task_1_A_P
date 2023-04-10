@@ -16,6 +16,7 @@ using namespace std;
     char *buff;
     int i, fd, amper, redirect, redirect_err, redirect_append, retid, status;
     char *argv[10];
+    char prompt[10] = "E_Shell2";
 
 
 void redirection_check()
@@ -43,10 +44,8 @@ void redirection_check()
         }
 }
 
-int main() {
-while (1)
+void cmd_parser()
 {
-    printf("hello: ");
     fgets(command, 1024, stdin);
     command[strlen(command) - 1] = '\0';
 
@@ -60,6 +59,14 @@ while (1)
         i++;
     }
     argv[i] = NULL;
+}
+
+int main() {
+while (1)
+{
+    printf("%s: ", prompt);
+    cmd_parser();
+    
     int j = 0;
     while(i > j)
     {
