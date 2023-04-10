@@ -21,7 +21,7 @@ using namespace std;
 
 void redirection_check()
 {
-    printf("redirect: %d  redirect_err: %d   redirect_append: %d\n", redirect, redirect_err, redirect_append);
+    //printf("redirect: %d  redirect_err: %d   redirect_append: %d\n", redirect, redirect_err, redirect_append);
     std::cout.flush();// flush the buffer so my prints wont get in the files
     if (redirect) {
             fd = creat(outfile, 0660); 
@@ -77,6 +77,15 @@ while (1)
     /* Is command empty */
     if (argv[0] == NULL)
         continue;
+    if ( argv[0]=="echo" )
+    {
+        for (int t = 1; argv[t] != NULL; t++)
+        {
+            printf("%s",argv[t]);
+        }
+        
+    }
+    
 
     if (argv[i-2] != NULL && !strcmp(argv[i - 2], "=") && !strcmp(argv[0], "prompt"))
     {
