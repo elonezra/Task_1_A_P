@@ -67,16 +67,22 @@ while (1)
     printf("%s: ", prompt);
     cmd_parser();
     
-    int j = 0;
-    while(i > j)
-    {
-        printf("%d) %s\n",j, argv[j]);
-        j++;
-    }
+    // int j = 0;
+    // while(i > j)
+    // {
+    //     printf("%d) %s\n",j, argv[j]);
+    //     j++;
+    // }
 
     /* Is command empty */
     if (argv[0] == NULL)
         continue;
+
+    if (argv[i-2] != NULL && !strcmp(argv[i - 2], "=") && !strcmp(argv[0], "prompt"))
+    {
+        // prompt = argv[i - 1];
+        strncpy(prompt, argv[i - 1], sizeof(prompt));
+    }
 
     /* Does command line end with & */ 
     if (! strcmp(argv[i - 1], "&")) {
