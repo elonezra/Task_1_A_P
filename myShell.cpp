@@ -63,6 +63,11 @@ void cmd_parser(char *cmd)
     argv[i] = NULL;
 }
 
+void cd_command(char* dir)
+{
+    if (chdir(dir) == -1)
+        perror("cd");
+}
 int main() {
 while (1)
 {
@@ -98,13 +103,19 @@ while (1)
         continue;
 
 
-    if ( argv[0]=="echo" )
+    // if (!strcmp(argv[0], "echo"))
+    // {
+    //     for (int t = 1; argv[t] != NULL; t++)
+    //     {
+    //         printf("%s",argv[t]);
+    //     }
+    // }
+    if (!strcmp(argv[0], "cd"))
     {
-        for (int t = 1; argv[t] != NULL; t++)
-        {
-            printf("%s",argv[t]);
-        }
+        cd_command(argv[1]);
     }
+    
+    
     if (argv[i-2] != NULL && !strcmp(argv[i - 2], "=") && !strcmp(argv[0], "prompt"))
     {
         strncpy(prompt, argv[i - 1], sizeof(prompt));
