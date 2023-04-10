@@ -20,6 +20,7 @@ using namespace std;
     char prompt[10] = "E_Shell2";
     char commands[MAX_COMMANDS][1024];
     int commands_index = 0;
+    char skip_exec_flag = 0;
 
 void redirection_check()
 {
@@ -46,6 +47,19 @@ void redirection_check()
         }
 }
 
+void echo_command(char **arg)
+{ 
+    int t = 1;
+    for (; arg[t] != NULL && arg[t] != ">"; t++)
+    {
+        printf("%s", arg[t]);
+    }
+        printf("\n");
+
+}
+
+
+
 void cmd_parser(char *cmd)
 {
 
@@ -71,6 +85,7 @@ void cd_command(char* dir)
 int main() {
 while (1)
 {
+    skip_exec_flag = 0;
     printf("%s: ", prompt);
     fgets(command, 1024, stdin);
     command[strlen(command) - 1] = '\0';
@@ -103,13 +118,16 @@ while (1)
         continue;
 
 
-    // if (!strcmp(argv[0], "echo"))
-    // {
-    //     for (int t = 1; argv[t] != NULL; t++)
-    //     {
-    //         printf("%s",argv[t]);
-    //     }
-    // }
+    if (!strcmp(argv[0], "echo"))
+    {
+        echo_command(argv);
+        skip_exec_flag = 1;
+    }
+    if (!strcmp(argv[0], "quit"))
+    {
+        exit(0);
+    }
+
     if (!strcmp(argv[0], "cd"))
     {
         cd_command(argv[1]);
@@ -157,8 +175,8 @@ while (1)
     if (fork() == 0) { 
         /* redirection of IO ? */
         redirection_check();
- 
-        execvp(argv[0], argv); 
+        if(!skip_exec_flag)
+            execvp(argv[0], argv); 
     }
     /* parent continues here */
     if (amper == 0)

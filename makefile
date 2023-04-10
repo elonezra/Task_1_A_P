@@ -1,7 +1,7 @@
 all: myshell run
 
 myshell: myShell.cpp
-	g++ -o myshell myShell.cpp
+	g++ -g -o myshell myShell.cpp
 
 .PHONY: run clean
 
