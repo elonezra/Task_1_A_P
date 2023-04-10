@@ -58,7 +58,11 @@ void echo_command(char **arg)
 
 }
 
-
+// Define the signal handler function
+void signalHandler(int signum) 
+{
+    printf("You typed Control-C! write `quit` to exit\n");
+}
 
 void cmd_parser(char *cmd)
 {
@@ -83,6 +87,9 @@ void cd_command(char* dir)
         perror("cd");
 }
 int main() {
+
+    signal(SIGINT, signalHandler);
+
 while (1)
 {
     skip_exec_flag = 0;
