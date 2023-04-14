@@ -146,7 +146,10 @@ void echo_command(char **arg)
     int t = 1;
     for (; arg[t] != NULL; t++)
     {
-        printf("%s", arg[t]);
+        if(!strcmp(arg[t],"$?"))
+            printf("%d ", status);
+        else
+            printf("%s ", arg[t]);
     }
     printf("\n");
 }
